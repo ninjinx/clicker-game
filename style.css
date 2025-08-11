@@ -1,102 +1,278 @@
-/* ベース設定 */
+/* --- ベース設定 --- */
 body {
   margin: 0;
   padding: 0;
   font-family: 'Montserrat', 'Noto Sans JP', Arial, sans-serif;
-  background: linear-gradient(135deg, #ffe29f 0%, #ffa99f 100%);
+  background: linear-gradient(135deg, #fffbe6 0%, #ffe29f 50%, #ffa99f 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  color: #6b4f1d;
 }
 
-/* ゲームコンテナ */
-.game-container {
-  background: rgba(255,255,255,0.85);
+/* --- ヘッダー --- */
+header {
+  width: 100%;
+  background: linear-gradient(90deg, #ffd700 60%, #ffb347 100%);
+  box-shadow: 0 2px 12px rgba(255,193,7,0.08);
+  padding: 18px 0 8px 0;
+  text-align: center;
+}
+header h1 {
+  font-family: 'Montserrat', 'Noto Sans JP', Arial, sans-serif;
+  font-size: 2.2rem;
+  color: #d2691e;
+  letter-spacing: 2px;
+  margin: 0;
+  text-shadow: 0 2px 8px #fff7e6;
+}
+
+/* --- ゲームコンテナ --- */
+.game-container, main {
+  background: rgba(255,255,255,0.92);
   border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
   padding: 32px 24px;
-  margin-top: 48px;
-  width: 360px;
-  max-width: 95vw;
+  margin-top: 32px;
+  width: 380px;
+  max-width: 98vw;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* カウンター表示 */
-.counter {
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: #ff7f50;
-  margin-bottom: 24px;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 8px #fff7e6;
-  transition: transform 0.15s;
+/* --- ポップコーン生産セクション --- */
+#popcorn-production-area {
+  background: linear-gradient(120deg, #fffbe6 60%, #ffd700 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(255,193,7,0.12);
+  padding: 24px 18px;
+  margin-bottom: 28px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
-/* クリックボタン */
-.cookie-btn {
-  background: radial-gradient(circle at 60% 40%, #ffd700 70%, #ff7f50 100%);
-  border: none;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  font-size: 2rem;
+#popcorn-machine img {
+  filter: drop-shadow(0 4px 12px #ffd70088);
+  margin-bottom: 12px;
+}
+#popcorn-stock-area, #popcorn-batch-area, #popcorn-stats-area, #popcorn-history-area, #popcorn-sell-area {
+  width: 100%;
+  margin-bottom: 12px;
+}
+#popcorn-batch-area label {
+  font-weight: bold;
+  color: #d2691e;
+}
+#batch-size {
+  border: 1px solid #ffd700;
+  border-radius: 6px;
+  padding: 4px;
+  font-size: 1.1rem;
+  width: 60px;
+  margin: 0 8px;
+  background: #fffbe6;
+}
+#produce-popcorn-btn, #sell-popcorn-btn {
+  background: linear-gradient(90deg, #ffd700 60%, #ff7f50 100%);
   color: #fff;
   font-weight: bold;
-  box-shadow: 0 4px 16px rgba(255,127,80,0.25);
+  border: none;
+  border-radius: 24px;
+  padding: 10px 22px;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(255,193,7,0.18);
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  margin-left: 8px;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
   outline: none;
   position: relative;
   user-select: none;
 }
-
-.cookie-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 8px 24px rgba(255,127,80,0.35);
-  background: radial-gradient(circle at 60% 40%, #ffe066 80%, #ff7f50 100%);
+#produce-popcorn-btn:hover, #sell-popcorn-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 6px 18px rgba(255,193,7,0.28);
+  background: linear-gradient(90deg, #ffe066 80%, #ff7f50 100%);
 }
-
-.cookie-btn:active {
+#produce-popcorn-btn:active, #sell-popcorn-btn:active {
   transform: scale(0.95);
-  box-shadow: 0 2px 8px rgba(255,127,80,0.18);
-  background: radial-gradient(circle at 60% 40%, #ffd700 60%, #ff7f50 100%);
+  box-shadow: 0 2px 8px rgba(255,193,7,0.12);
+  background: linear-gradient(90deg, #ffd700 60%, #ff7f50 100%);
   animation: click-pop 0.2s;
 }
-
 @keyframes click-pop {
   0% { transform: scale(1); }
   50% { transform: scale(1.15); }
   100% { transform: scale(0.95); }
 }
 
-/* ボタン上のアイコン */
-.cookie-btn .icon {
-  font-size: 3rem;
-  pointer-events: none;
+/* --- 統計表示 --- */
+#popcorn-stats-area h3 {
+  font-size: 1.1rem;
+  color: #d2691e;
+  margin-bottom: 6px;
+}
+#popcorn-stats-area ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#popcorn-stats-area li {
+  font-size: 1rem;
+  color: #6b4f1d;
+  margin-bottom: 2px;
+  padding-left: 0;
 }
 
-/* レスポンシブ対応 */
-@media (max-width: 600px) {
-  .game-container {
-    width: 98vw;
-    padding: 18px 6vw;
-    margin-top: 18px;
-  }
-  .cookie-btn {
-    width: 90px;
-    height: 90px;
-    font-size: 1.4rem;
-  }
-  .counter {
-    font-size: 2rem;
-  }
+/* --- 生産履歴 --- */
+#popcorn-history-area h3 {
+  font-size: 1rem;
+  color: #d2691e;
+  margin-bottom: 4px;
+}
+#popcorn-history {
+  font-size: 0.95rem;
+  color: #6b4f1d;
+  margin: 0;
+  padding-left: 18px;
 }
 
-/* 補助テキストや説明 */
+/* --- 育成中トウモロコシリスト --- */
+#corn-grow-area {
+  background: linear-gradient(120deg, #ffe29f 60%, #fffbe6 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(255,193,7,0.10);
+  padding: 18px 14px;
+  margin-bottom: 28px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#corn-grow-area h2 {
+  color: #d2691e;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+#corn-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+.corn-item {
+  background: #fffbe6;
+  border: 2px solid #ffd700;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  color: #6b4f1d;
+  box-shadow: 0 2px 8px rgba(255,193,7,0.10);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 90px;
+  max-width: 140px;
+  justify-content: center;
+}
+.corn-item .corn-icon {
+  font-size: 1.5rem;
+  margin-right: 4px;
+}
+
+/* --- カウンター表示 --- */
+#counter-area {
+  margin: 18px 0 10px 0;
+  text-align: center;
+}
+#corn-count, #popcorn-count {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #ff7f50;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px #fff7e6;
+  transition: transform 0.15s;
+}
+
+/* --- トウモロコシ育成ボタン --- */
+#corn-button {
+  background: radial-gradient(circle at 60% 40%, #ffd700 70%, #ff7f50 100%);
+  border: none;
+  border-radius: 24px;
+  width: 220px;
+  height: 54px;
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 4px 16px rgba(255,193,7,0.18);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  outline: none;
+  user-select: none;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+#corn-button:hover {
+  transform: scale(1.06);
+  box-shadow: 0 8px 24px rgba(255,193,7,0.28);
+  background: radial-gradient(circle at 60% 40%, #ffe066 80%, #ff7f50 100%);
+}
+#corn-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(255,193,7,0.12);
+  background: radial-gradient(circle at 60% 40%, #ffd700 60%, #ff7f50 100%);
+  animation: click-pop 0.2s;
+}
+
+/* --- 進度バー・タイマー（仮） --- */
+.progress-bar {
+  width: 100%;
+  max-width: 320px;
+  height: 18px;
+  background: #ffe29f;
+  border-radius: 9px;
+  overflow: hidden;
+  margin: 10px 0;
+  box-shadow: 0 2px 8px rgba(255,193,7,0.10);
+  position: relative;
+}
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700 60%, #ff7f50 100%);
+  border-radius: 9px;
+  transition: width 0.4s cubic-bezier(.4,2,.6,1);
+}
+.timer {
+  font-size: 1rem;
+  color: #d2691e;
+  margin: 6px 0 0 0;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* --- フッター --- */
+footer {
+  width: 100%;
+  text-align: center;
+  padding: 18px 0 8px 0;
+  background: linear-gradient(90deg, #ffd700 60%, #ffb347 100%);
+  color: #6b4f1d;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  margin-top: 32px;
+  border-radius: 0 0 24px 24px;
+}
+
+/* --- 補助テキストや説明 --- */
 .info {
   font-size: 1rem;
   color: #555;
@@ -105,12 +281,89 @@ body {
   line-height: 1.6;
 }
 
-/* アニメーション: カウンター増加時のフィードバック */
-.counter.bump {
+/* --- アニメーション: カウンター増加時のフィードバック --- */
+#corn-count.bump, #popcorn-count.bump {
   animation: bump 0.18s;
 }
 @keyframes bump {
   0% { transform: scale(1); }
   50% { transform: scale(1.18); }
   100% { transform: scale(1); }
+}
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 900px) {
+  .game-container, main {
+    width: 98vw;
+    padding: 18px 2vw;
+    margin-top: 18px;
+    border-radius: 18px;
+  }
+  #popcorn-production-area, #corn-grow-area {
+    max-width: 98vw;
+    padding: 12px 2vw;
+    margin-bottom: 18px;
+    border-radius: 14px;
+  }
+}
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 1.3rem;
+  }
+  .game-container, main {
+    width: 100vw;
+    padding: 8px 1vw;
+    margin-top: 8px;
+    border-radius: 12px;
+  }
+  #popcorn-production-area, #corn-grow-area {
+    max-width: 100vw;
+    padding: 8px 1vw;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+  #corn-button {
+    width: 98vw;
+    height: 44px;
+    font-size: 1rem;
+  }
+  #produce-popcorn-btn, #sell-popcorn-btn {
+    padding: 8px 12px;
+    font-size: 1rem;
+  }
+  #batch-size {
+    width: 40px;
+    font-size: 0.95rem;
+  }
+  #corn-list {
+    gap: 6px;
+  }
+  .corn-item {
+    font-size: 0.95rem;
+    min-width: 70px;
+    max-width: 100px;
+    padding: 6px 8px;
+  }
+  #counter-area {
+    margin: 10px 0 6px 0;
+  }
+  #corn-count, #popcorn-count {
+    font-size: 1.3rem;
+  }
+  .progress-bar {
+    max-width: 98vw;
+    height: 12px;
+  }
+  .timer {
+    font-size: 0.95rem;
+  }
+}
+
+/* --- アクセシビリティ --- */
+button:focus, input:focus {
+  outline: 2px solid #ff7f50;
+  outline-offset: 2px;
+}
+[aria-label] {
+  cursor: pointer;
 }

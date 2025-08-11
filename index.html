@@ -3,28 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>クッキークリッカー風ゲーム</title>
+  <title>ポップコーンメーカー</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>クッキークリッカー風ゲーム</h1>
+    <h1>ポップコーンメーカー</h1>
   </header>
   <main>
     <section>
-      <button id="cookie-button" type="button" aria-label="クッキーをクリック">
-        🍪 クリック！
+      <button id="corn-button" type="button" aria-label="トウモロコシを育てる">
+        🌽 トウモロコシを育てる！
       </button>
       <div id="counter-area">
-        <p>クッキー数: <span id="cookie-count">0</span></p>
+        <p>トウモロコシ: <span id="corn-count">0</span></p>
       </div>
     </section>
     <section id="expansion-container">
       <!-- 拡張用コンテナ（将来のアップグレードやショップ等） -->
     </section>
+
+    <section id="popcorn-production-area">
+      <h2>ポップコーン生産</h2>
+      <div id="popcorn-machine">
+        <img src="https://cdn.pixabay.com/photo/2016/03/31/19/14/popcorn-1295373_1280.png" alt="ポップコーンマシン" style="width:120px;">
+      </div>
+      <div id="popcorn-stock-area">
+        <p>ポップコーン在庫: <span id="popcorn-count">0</span></p>
+      </div>
+      <div id="popcorn-batch-area">
+        <label for="batch-size">バッチ生産数:</label>
+        <input type="number" id="batch-size" min="1" value="1" style="width:60px;">
+        <button id="produce-popcorn-btn" type="button">ポップコーンを生産！</button>
+      </div>
+      <div id="popcorn-stats-area">
+        <h3>生産統計</h3>
+        <ul>
+          <li>累計生産: <span id="popcorn-total">0</span></li>
+          <li>累計販売: <span id="popcorn-sold">0</span></li>
+          <li>生産効率: <span id="popcorn-efficiency">1</span>個/トウモロコシ</li>
+        </ul>
+      </div>
+      <div id="popcorn-history-area">
+        <h3>生産履歴</h3>
+        <ul id="popcorn-history"></ul>
+      </div>
+      <div id="popcorn-sell-area">
+        <button id="sell-popcorn-btn" type="button">ポップコーンを販売（準備中）</button>
+      </div>
+    </section>
+
+    <section id="corn-grow-area">
+      <h2>育成中のトウモロコシ</h2>
+      <div id="corn-list"></div>
+    </section>
   </main>
   <footer>
-    <small>&copy; 2025 クッキークリッカー風ゲーム</small>
+    <small>&copy; 2025 ポップコーンメーカー</small>
   </footer>
   <script src="script.js"></script>
 </body>
