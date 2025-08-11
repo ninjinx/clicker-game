@@ -367,3 +367,12 @@ button:focus, input:focus {
 [aria-label] {
   cursor: pointer;
 }
+.low-resource {
+  color: #d32f2f !important;
+  font-weight: bold;
+}
+.disabled-btn {
+  background: #ccc !important;
+  color: #888 !important;
+  cursor: not-allowed !important;
+}

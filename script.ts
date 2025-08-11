@@ -16,7 +16,7 @@ export type PopcornEntry = {
 
 export type GameState = {
     corns: Corn[];
-    matureCount: number;
+    cornSeedCount: number; // トウモロコシの実の総数
     popcornCount: number;
     popcornTotal: number;
     popcornSold: number;
@@ -59,7 +59,7 @@ export function setupGame(
 
     // 育成中コーンリスト
     let corns: Corn[] = [];
-    let matureCount: number = 0;
+    let cornSeedCount: number = 0;
 
     // ポップコーン在庫・統計
     let popcornCount: number = 0;
@@ -75,15 +75,20 @@ export function setupGame(
             if (saved) {
                 const data = JSON.parse(saved);
                 corns = data.corns || [];
-                matureCount = data.matureCount || 0;
+                cornSeedCount = data.cornSeedCount ?? 30; // 初期値30
                 popcornCount = data.popcornCount || 0;
                 popcornTotal = data.popcornTotal || 0;
                 popcornSold = data.popcornSold || 0;
-                popcornEfficiency = data.popcornEfficiency || 1;
+                popcornEfficiency = data.popcornEfficiency ?? 2; // 生産効率初期値2
                 popcornHistory = data.popcornHistory || [];
+            } else {
+                cornSeedCount = 30; // 初期値30
+                popcornEfficiency = 2; // 生産効率初期値2
             }
         } catch (e) {
             console.error('ローカルストレージ読み込みエラー:', e);
+            cornSeedCount = 30;
+            popcornEfficiency = 2;
         }
     }
 
@@ -93,7 +98,7 @@ export function setupGame(
             if (typeof localStorage !== 'undefined') {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify({
                     corns,
-                    matureCount,
+                    cornSeedCount,
                     popcornCount,
                     popcornTotal,
                     popcornSold,
@@ -108,6 +113,12 @@ export function setupGame(
 
     // 新しいコーンを植える
     function plantCorn(): void {
+        // トウモロコシの実が1個以上ないと植えられない
+        if (cornSeedCount < 1) {
+            alertFn('トウモロコシの実が足りません');
+            return;
+        }
+        cornSeedCount -= 1;
         const id = Date.now() + Math.random();
         corns.push({
             id,
@@ -118,6 +129,7 @@ export function setupGame(
         });
         saveData();
         renderCorns();
+        updateCounter();
     }
 
     // 成長処理
@@ -145,7 +157,8 @@ export function setupGame(
         const idx = corns.findIndex(c => c.id === id);
         if (idx !== -1 && corns[idx].stage === STAGES.length - 1) {
             corns.splice(idx, 1);
-            matureCount += 1;
+            // トウモロコシの実を10個獲得（収穫量は将来的に変動可能）
+            cornSeedCount += 8; // 収穫効率を8個に調整
             saveData();
             renderCorns();
             updateCounter();
@@ -154,11 +167,40 @@ export function setupGame(
 
     // カウンター表示
     function updateCounter(): void {
-        counterDisplay.textContent = matureCount.toString();
+        counterDisplay.textContent = cornSeedCount.toString();
         popcornCountDisplay.textContent = popcornCount.toString();
         popcornTotalDisplay.textContent = popcornTotal.toString();
         popcornSoldDisplay.textContent = popcornSold.toString();
         popcornEfficiencyDisplay.textContent = popcornEfficiency.toString();
+        updateProduceButtonState();
+
+        // 残量表示の色変更
+        const batch = Math.max(1, parseInt(batchSizeInput.value, 10) || 1);
+        if (cornSeedCount < batch) {
+            counterDisplay.classList.add('low-resource');
+        } else {
+            counterDisplay.classList.remove('low-resource');
+        }
+    }
+
+    // ポップコーン生産ボタンの有効/無効状態制御
+    function updateProduceButtonState(): void {
+        const batch = Math.max(1, parseInt(batchSizeInput.value, 10) || 1);
+        if (cornSeedCount < batch) {
+            if (typeof producePopcornBtn.setAttribute === 'function') {
+                producePopcornBtn.setAttribute('disabled', 'true');
+            }
+            if (producePopcornBtn.classList && typeof producePopcornBtn.classList.add === 'function') {
+                producePopcornBtn.classList.add('disabled-btn');
+            }
+        } else {
+            if (typeof producePopcornBtn.removeAttribute === 'function') {
+                producePopcornBtn.removeAttribute('disabled');
+            }
+            if (producePopcornBtn.classList && typeof producePopcornBtn.classList.remove === 'function') {
+                producePopcornBtn.classList.remove('disabled-btn');
+            }
+        }
     }
 
     // 育成中リスト表示
@@ -192,13 +234,17 @@ export function setupGame(
     }
 
     // ポップコーン生産
+// --- DEBUG LOG: producePopcorn成熟コーン消費前 ---
+console.log('[DEBUG] corns(before):', corns.map(c => c.stage));
+console.log('[DEBUG] matureCount:', corns.filter(c => c.stage === STAGES.length - 1).length);
     function producePopcorn(batch: number = 1): void {
-        if (matureCount < batch) {
-            alertFn('トウモロコシが足りません');
+        // トウモロコシの実が足りない場合は生産不可
+        if (cornSeedCount < batch) {
+            alertFn('トウモロコシの実が足りません');
             return;
         }
         const produced = batch * popcornEfficiency;
-        matureCount -= batch;
+        cornSeedCount -= batch;
         popcornCount += produced;
         popcornTotal += produced;
         // 履歴記録
@@ -267,7 +313,10 @@ export function setupGame(
     producePopcornBtn.onclick = function () {
         const batch = Math.max(1, parseInt(batchSizeInput.value, 10) || 1);
         producePopcorn(batch);
+        updateProduceButtonState();
     };
+
+
 
     // 植えるボタン
     clickButton.onclick = function () {
@@ -283,6 +332,11 @@ export function setupGame(
     // 成長タイマー
     setInterval(updateGrowth, 1000);
 
+    // batchSizeInput変更時にボタン状態更新（テスト環境対応）
+    if (typeof batchSizeInput.addEventListener === 'function') {
+        batchSizeInput.addEventListener('input', updateProduceButtonState);
+    }
+
     // テスト用に主要関数を返す
     return {
         plantCorn,
@@ -291,13 +345,26 @@ export function setupGame(
         harvestCorn,
         getState: (): GameState => ({
             corns,
-            matureCount,
+            cornSeedCount,
             popcornCount,
             popcornTotal,
             popcornSold,
             popcornEfficiency,
             popcornHistory
-        })
+        }),
+        addMatureCornForTest: (count: number = 1) => {
+            for (let i = 0; i < count; i++) {
+                corns.push({
+                    id: Date.now() + Math.random(),
+                    stage: STAGES.length - 1,
+                    progress: 0,
+                    plantedAt: Date.now(),
+                    lastUpdate: Date.now()
+                });
+            }
+            saveData();
+            renderCorns();
+        }
     };
 }
 

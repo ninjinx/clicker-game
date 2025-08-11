@@ -57,9 +57,52 @@ describe('ポップコーンメーカーゲーム', () => {
     expect(game.getState().corns.length).toBe(1);
   });
 
-  it('成熟トウモロコシがないとポップコーン生産できない', () => {
-    game.producePopcorn(1);
-    expect(game.getState().popcornCount).toBe(0);
+  it('トウモロコシの実がないとポップコーン生産できない', () => {
+      // 実を0にしてから生産
+      while (game.getState().cornSeedCount > 0) {
+          game.plantCorn();
+      }
+      game.producePopcorn(1);
+      expect(game.getState().popcornCount).toBe(0);
+  });
+  
+  it('トウモロコシの実がある場合はポップコーンが生産できる', () => {
+      // 実を1個残して生産
+      while (game.getState().cornSeedCount > 1) {
+          game.plantCorn();
+      }
+      const before = game.getState().popcornCount;
+      game.producePopcorn(1);
+      const after = game.getState().popcornCount;
+      expect(after).toBe(before + game.getState().popcornEfficiency);
+  });
+  
+  it('トウモロコシを植えると実が1個消費される', () => {
+      const before = game.getState().cornSeedCount;
+      game.plantCorn();
+      const after = game.getState().cornSeedCount;
+      expect(after).toBe(before - 1);
+  });
+  
+  it('トウモロコシの実が0個なら植えられない', () => {
+      // 実を0にしてから植える
+      while (game.getState().cornSeedCount > 0) {
+          game.plantCorn();
+      }
+      const before = game.getState().cornSeedCount;
+      game.plantCorn();
+      const after = game.getState().cornSeedCount;
+      expect(after).toBe(before); // 消費されない
+      expect(game.getState().corns.length).toBe(30); // 追加されない
+  });
+  
+  it('植えた後、残量表示が更新される', () => {
+      const dom = createMockDOM();
+      const game2 = setupGame(dom, () => {});
+      const before = dom.getElementById('corn-count').textContent;
+      game2.plantCorn();
+      const after = dom.getElementById('corn-count').textContent;
+      expect(after).not.toBe(before);
   });
 
 // 画像リソースが存在するかチェックするテスト
