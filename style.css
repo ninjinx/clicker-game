@@ -1,0 +1,116 @@
+/* ベース設定 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Montserrat', 'Noto Sans JP', Arial, sans-serif;
+  background: linear-gradient(135deg, #ffe29f 0%, #ffa99f 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* ゲームコンテナ */
+.game-container {
+  background: rgba(255,255,255,0.85);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 32px 24px;
+  margin-top: 48px;
+  width: 360px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* カウンター表示 */
+.counter {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #ff7f50;
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px #fff7e6;
+  transition: transform 0.15s;
+}
+
+/* クリックボタン */
+.cookie-btn {
+  background: radial-gradient(circle at 60% 40%, #ffd700 70%, #ff7f50 100%);
+  border: none;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  font-size: 2rem;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 4px 16px rgba(255,127,80,0.25);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  outline: none;
+  position: relative;
+  user-select: none;
+}
+
+.cookie-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 24px rgba(255,127,80,0.35);
+  background: radial-gradient(circle at 60% 40%, #ffe066 80%, #ff7f50 100%);
+}
+
+.cookie-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(255,127,80,0.18);
+  background: radial-gradient(circle at 60% 40%, #ffd700 60%, #ff7f50 100%);
+  animation: click-pop 0.2s;
+}
+
+@keyframes click-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(0.95); }
+}
+
+/* ボタン上のアイコン */
+.cookie-btn .icon {
+  font-size: 3rem;
+  pointer-events: none;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+  .game-container {
+    width: 98vw;
+    padding: 18px 6vw;
+    margin-top: 18px;
+  }
+  .cookie-btn {
+    width: 90px;
+    height: 90px;
+    font-size: 1.4rem;
+  }
+  .counter {
+    font-size: 2rem;
+  }
+}
+
+/* 補助テキストや説明 */
+.info {
+  font-size: 1rem;
+  color: #555;
+  margin-top: 18px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* アニメーション: カウンター増加時のフィードバック */
+.counter.bump {
+  animation: bump 0.18s;
+}
+@keyframes bump {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
