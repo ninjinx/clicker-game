@@ -226,7 +226,7 @@ export function setupGame(
         // 簡易エフェクト
         for (let i = 0; i < Math.min(amount, 10); i++) {
             const img = dom.createElement('img') as HTMLImageElement;
-            img.src = 'https://cdn.pixabay.com/photo/2016/03/31/19/14/popcorn-1295373_1280.png';
+            img.src = 'images/popcorn.png';
             img.style.position = 'absolute';
             img.style.width = '32px';
             img.style.left = (80 + Math.random() * 40) + 'px';

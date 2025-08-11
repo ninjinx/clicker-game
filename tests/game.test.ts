@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { setupGame, GameDOM, GameState } from '../script';
+import { setupGame, GameDOM } from '../script';
+import * as fs from 'fs';
+import * as path from 'path';
 
 function createMockDOM(): GameDOM {
-  // 必要な要素だけ簡易モック
   const elements: Record<string, any> = {};
   [
     'corn-list', 'corn-button', 'corn-count',
@@ -60,4 +61,17 @@ describe('ポップコーンメーカーゲーム', () => {
     game.producePopcorn(1);
     expect(game.getState().popcornCount).toBe(0);
   });
+
+// 画像リソースが存在するかチェックするテスト
+describe('画像リソースが存在する', () => {
+  it('images/popcorn.png ファイルが存在すること', () => {
+    const imgPath = path.join(__dirname, '../images/popcorn.png');
+    const exists = fs.existsSync(imgPath);
+    expect(exists).toBe(true);
+    if (!exists) {
+      // テスト失敗時に明確なメッセージを表示
+      throw new Error('画像データが必要です: images/popcorn.png をプロジェクトに追加してください。');
+    }
+  });
+});
 });
