@@ -1,0 +1,21 @@
+{
+  "name": "popcorn-maker-game",
+  "version": "1.0.0",
+  "description": "ポップコーンメーカーゲームのテスト環境付きプロジェクト",
+  "main": "script.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "vitest": "^3.2.4"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "transform": {},
+    "extensionsToTreatAsEsm": [
+      ".js"
+    ]
+  }
+}

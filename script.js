@@ -1,25 +1,26 @@
 // トウモロコシ育成システム
-document.addEventListener('DOMContentLoaded', function () {
-    const cornListArea = document.getElementById('corn-list');
-    const clickButton = document.getElementById('corn-button');
-    const counterDisplay = document.getElementById('corn-count');
+export function setupGame(dom = document, alertFn = typeof window !== 'undefined' ? window.alert : () => {}) {
+    // DOMContentLoaded相当の初期化
+    const cornListArea = dom.getElementById('corn-list');
+    const clickButton = dom.getElementById('corn-button');
+    const counterDisplay = dom.getElementById('corn-count');
     const STORAGE_KEY = 'cornGrowerV1';
     // ポップコーン関連
-    const popcornCountDisplay = document.getElementById('popcorn-count');
-    const popcornTotalDisplay = document.getElementById('popcorn-total');
-    const popcornSoldDisplay = document.getElementById('popcorn-sold');
-    const popcornEfficiencyDisplay = document.getElementById('popcorn-efficiency');
-    const batchSizeInput = document.getElementById('batch-size');
-    const producePopcornBtn = document.getElementById('produce-popcorn-btn');
-    const popcornHistoryList = document.getElementById('popcorn-history');
-    const sellPopcornBtn = document.getElementById('sell-popcorn-btn');
+    const popcornCountDisplay = dom.getElementById('popcorn-count');
+    const popcornTotalDisplay = dom.getElementById('popcorn-total');
+    const popcornSoldDisplay = dom.getElementById('popcorn-sold');
+    const popcornEfficiencyDisplay = dom.getElementById('popcorn-efficiency');
+    const batchSizeInput = dom.getElementById('batch-size');
+    const producePopcornBtn = dom.getElementById('produce-popcorn-btn');
+    const popcornHistoryList = dom.getElementById('popcorn-history');
+    const sellPopcornBtn = dom.getElementById('sell-popcorn-btn');
 
     // 成長段階
     const STAGES = [
-        { name: '種', duration: 10 },      // 秒
+        { name: '種', duration: 10 },
         { name: '芽', duration: 20 },
         { name: '若い苗', duration: 30 },
-        { name: '成熟', duration: 0 }      // 最終段階はduration不要
+        { name: '成熟', duration: 0 }
     ];
 
     // 育成中コーンリスト
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let popcornCount = 0;
     let popcornTotal = 0;
     let popcornSold = 0;
-    let popcornEfficiency = 1; // 1トウモロコシ→1ポップコーン（アップグレード基盤）
+    let popcornEfficiency = 1;
     let popcornHistory = [];
 
     // ローカルストレージから復元
@@ -134,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
         corns.forEach(corn => {
             const stageObj = STAGES[corn.stage];
             const isMature = corn.stage === STAGES.length - 1;
-            const div = document.createElement('div');
+            const div = dom.createElement('div');
             div.className = 'corn-item';
             div.innerHTML = `
                 <span>🌱 ${stageObj.name}</span>
@@ -146,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cornListArea.appendChild(div);
         });
         // 収穫ボタンイベント
-        document.querySelectorAll('.harvest-btn').forEach(btn => {
+        dom.querySelectorAll('.harvest-btn').forEach(btn => {
             btn.onclick = function () {
                 const id = Number(btn.getAttribute('data-id'));
                 harvestCorn(id);
@@ -157,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ポップコーン生産
     function producePopcorn(batch = 1) {
         if (matureCount < batch) {
-            alert('トウモロコシが足りません');
+            alertFn('トウモロコシが足りません');
             return;
         }
         const produced = batch * popcornEfficiency;
@@ -180,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 生産アニメーション
     function animateProduction(amount) {
-        const machine = document.getElementById('popcorn-machine');
+        const machine = dom.getElementById('popcorn-machine');
         if (!machine) return;
         machine.classList.add('pop');
         setTimeout(() => {
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 600);
         // 簡易エフェクト
         for (let i = 0; i < Math.min(amount, 10); i++) {
-            const img = document.createElement('img');
+            const img = dom.createElement('img');
             img.src = 'https://cdn.pixabay.com/photo/2016/03/31/19/14/popcorn-1295373_1280.png';
             img.style.position = 'absolute';
             img.style.width = '32px';
@@ -215,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         popcornHistory.forEach(entry => {
-            const li = document.createElement('li');
+            const li = dom.createElement('li');
             li.textContent = `${entry.time}: トウモロコシ${entry.batch}個→ポップコーン${entry.produced}個`;
             popcornHistoryList.appendChild(li);
         });
@@ -245,4 +246,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 成長タイマー
     setInterval(updateGrowth, 1000);
-});
+
+    // テスト用に主要関数を返す
+    return {
+        plantCorn,
+        producePopcorn,
+        updateGrowth,
+        harvestCorn,
+        getState: () => ({
+            corns,
+            matureCount,
+            popcornCount,
+            popcornTotal,
+            popcornSold,
+            popcornEfficiency,
+            popcornHistory
+        })
+    };
+}
+
+if (typeof window !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setupGame(document);
+    });
+}
