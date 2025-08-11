@@ -1,22 +1,56 @@
 // トウモロコシ育成システム
-export function setupGame(dom = document, alertFn = typeof window !== 'undefined' ? window.alert : () => {}) {
+
+export type Corn = {
+    id: number;
+    stage: number;
+    progress: number;
+    plantedAt: number;
+    lastUpdate: number;
+};
+
+export type PopcornEntry = {
+    time: string;
+    batch: number;
+    produced: number;
+};
+
+export type GameState = {
+    corns: Corn[];
+    matureCount: number;
+    popcornCount: number;
+    popcornTotal: number;
+    popcornSold: number;
+    popcornEfficiency: number;
+    popcornHistory: PopcornEntry[];
+};
+
+export interface GameDOM {
+    getElementById(id: string): HTMLElement | null;
+    createElement(tag: string): HTMLElement;
+    querySelectorAll(selector: string): NodeListOf<HTMLElement>;
+}
+
+export function setupGame(
+    dom: GameDOM = document,
+    alertFn: (msg: string) => void = typeof window !== 'undefined' ? window.alert : () => {}
+) {
     // DOMContentLoaded相当の初期化
-    const cornListArea = dom.getElementById('corn-list');
-    const clickButton = dom.getElementById('corn-button');
-    const counterDisplay = dom.getElementById('corn-count');
+    const cornListArea = dom.getElementById('corn-list') as HTMLElement;
+    const clickButton = dom.getElementById('corn-button') as HTMLElement;
+    const counterDisplay = dom.getElementById('corn-count') as HTMLElement;
     const STORAGE_KEY = 'cornGrowerV1';
     // ポップコーン関連
-    const popcornCountDisplay = dom.getElementById('popcorn-count');
-    const popcornTotalDisplay = dom.getElementById('popcorn-total');
-    const popcornSoldDisplay = dom.getElementById('popcorn-sold');
-    const popcornEfficiencyDisplay = dom.getElementById('popcorn-efficiency');
-    const batchSizeInput = dom.getElementById('batch-size');
-    const producePopcornBtn = dom.getElementById('produce-popcorn-btn');
-    const popcornHistoryList = dom.getElementById('popcorn-history');
-    const sellPopcornBtn = dom.getElementById('sell-popcorn-btn');
+    const popcornCountDisplay = dom.getElementById('popcorn-count') as HTMLElement;
+    const popcornTotalDisplay = dom.getElementById('popcorn-total') as HTMLElement;
+    const popcornSoldDisplay = dom.getElementById('popcorn-sold') as HTMLElement;
+    const popcornEfficiencyDisplay = dom.getElementById('popcorn-efficiency') as HTMLElement;
+    const batchSizeInput = dom.getElementById('batch-size') as HTMLInputElement;
+    const producePopcornBtn = dom.getElementById('produce-popcorn-btn') as HTMLElement;
+    const popcornHistoryList = dom.getElementById('popcorn-history') as HTMLElement;
+    const sellPopcornBtn = dom.getElementById('sell-popcorn-btn') as HTMLElement;
 
     // 成長段階
-    const STAGES = [
+    const STAGES: { name: string; duration: number }[] = [
         { name: '種', duration: 10 },
         { name: '芽', duration: 20 },
         { name: '若い苗', duration: 30 },
@@ -24,20 +58,20 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
     ];
 
     // 育成中コーンリスト
-    let corns = [];
-    let matureCount = 0;
+    let corns: Corn[] = [];
+    let matureCount: number = 0;
 
     // ポップコーン在庫・統計
-    let popcornCount = 0;
-    let popcornTotal = 0;
-    let popcornSold = 0;
-    let popcornEfficiency = 1;
-    let popcornHistory = [];
+    let popcornCount: number = 0;
+    let popcornTotal: number = 0;
+    let popcornSold: number = 0;
+    let popcornEfficiency: number = 1;
+    let popcornHistory: PopcornEntry[] = [];
 
     // ローカルストレージから復元
-    function loadData() {
+    function loadData(): void {
         try {
-            const saved = localStorage.getItem(STORAGE_KEY);
+            const saved = (typeof localStorage !== 'undefined') ? localStorage.getItem(STORAGE_KEY) : null;
             if (saved) {
                 const data = JSON.parse(saved);
                 corns = data.corns || [];
@@ -54,24 +88,26 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
     }
 
     // ローカルストレージ保存
-    function saveData() {
+    function saveData(): void {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                corns,
-                matureCount,
-                popcornCount,
-                popcornTotal,
-                popcornSold,
-                popcornEfficiency,
-                popcornHistory
-            }));
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    corns,
+                    matureCount,
+                    popcornCount,
+                    popcornTotal,
+                    popcornSold,
+                    popcornEfficiency,
+                    popcornHistory
+                }));
+            }
         } catch (e) {
             console.error('ローカルストレージ保存エラー:', e);
         }
     }
 
     // 新しいコーンを植える
-    function plantCorn() {
+    function plantCorn(): void {
         const id = Date.now() + Math.random();
         corns.push({
             id,
@@ -85,7 +121,7 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
     }
 
     // 成長処理
-    function updateGrowth() {
+    function updateGrowth(): void {
         const now = Date.now();
         let changed = false;
         corns.forEach(corn => {
@@ -105,7 +141,7 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
     }
 
     // 収穫
-    function harvestCorn(id) {
+    function harvestCorn(id: number): void {
         const idx = corns.findIndex(c => c.id === id);
         if (idx !== -1 && corns[idx].stage === STAGES.length - 1) {
             corns.splice(idx, 1);
@@ -117,16 +153,16 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
     }
 
     // カウンター表示
-    function updateCounter() {
-        counterDisplay.textContent = matureCount;
-        popcornCountDisplay.textContent = popcornCount;
-        popcornTotalDisplay.textContent = popcornTotal;
-        popcornSoldDisplay.textContent = popcornSold;
-        popcornEfficiencyDisplay.textContent = popcornEfficiency;
+    function updateCounter(): void {
+        counterDisplay.textContent = matureCount.toString();
+        popcornCountDisplay.textContent = popcornCount.toString();
+        popcornTotalDisplay.textContent = popcornTotal.toString();
+        popcornSoldDisplay.textContent = popcornSold.toString();
+        popcornEfficiencyDisplay.textContent = popcornEfficiency.toString();
     }
 
     // 育成中リスト表示
-    function renderCorns() {
+    function renderCorns(): void {
         cornListArea.innerHTML = '';
         if (corns.length === 0) {
             cornListArea.innerHTML = '<p>育成中のトウモロコシはありません。</p>';
@@ -135,7 +171,7 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
         corns.forEach(corn => {
             const stageObj = STAGES[corn.stage];
             const isMature = corn.stage === STAGES.length - 1;
-            const div = dom.createElement('div');
+            const div = dom.createElement('div') as HTMLElement;
             div.className = 'corn-item';
             div.innerHTML = `
                 <span>🌱 ${stageObj.name}</span>
@@ -149,14 +185,14 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
         // 収穫ボタンイベント
         dom.querySelectorAll('.harvest-btn').forEach(btn => {
             btn.onclick = function () {
-                const id = Number(btn.getAttribute('data-id'));
+                const id = Number((btn as HTMLElement).getAttribute('data-id'));
                 harvestCorn(id);
             };
         });
     }
 
     // ポップコーン生産
-    function producePopcorn(batch = 1) {
+    function producePopcorn(batch: number = 1): void {
         if (matureCount < batch) {
             alertFn('トウモロコシが足りません');
             return;
@@ -166,7 +202,7 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
         popcornCount += produced;
         popcornTotal += produced;
         // 履歴記録
-        const entry = {
+        const entry: PopcornEntry = {
             time: new Date().toLocaleString(),
             batch,
             produced
@@ -180,8 +216,8 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
     }
 
     // 生産アニメーション
-    function animateProduction(amount) {
-        const machine = dom.getElementById('popcorn-machine');
+    function animateProduction(amount: number): void {
+        const machine = dom.getElementById('popcorn-machine') as HTMLElement;
         if (!machine) return;
         machine.classList.add('pop');
         setTimeout(() => {
@@ -189,7 +225,7 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
         }, 600);
         // 簡易エフェクト
         for (let i = 0; i < Math.min(amount, 10); i++) {
-            const img = dom.createElement('img');
+            const img = dom.createElement('img') as HTMLImageElement;
             img.src = 'https://cdn.pixabay.com/photo/2016/03/31/19/14/popcorn-1295373_1280.png';
             img.style.position = 'absolute';
             img.style.width = '32px';
@@ -209,14 +245,14 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
     }
 
     // 履歴表示
-    function renderPopcornHistory() {
+    function renderPopcornHistory(): void {
         popcornHistoryList.innerHTML = '';
         if (popcornHistory.length === 0) {
             popcornHistoryList.innerHTML = '<li>生産履歴なし</li>';
             return;
         }
         popcornHistory.forEach(entry => {
-            const li = dom.createElement('li');
+            const li = dom.createElement('li') as HTMLElement;
             li.textContent = `${entry.time}: トウモロコシ${entry.batch}個→ポップコーン${entry.produced}個`;
             popcornHistoryList.appendChild(li);
         });
@@ -253,7 +289,7 @@ export function setupGame(dom = document, alertFn = typeof window !== 'undefined
         producePopcorn,
         updateGrowth,
         harvestCorn,
-        getState: () => ({
+        getState: (): GameState => ({
             corns,
             matureCount,
             popcornCount,
