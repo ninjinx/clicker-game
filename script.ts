@@ -125,9 +125,8 @@ export function setupGame(
             return;
         }
         cornSeedCount -= 1;
-        const id = Date.now() + Math.random();
         corns.push({
-            id,
+            id: Date.now() + Math.random(),
             stage: 0,
             progress: 0,
             plantedAt: Date.now(),
@@ -182,9 +181,6 @@ export function setupGame(
             coinCountDisplay.textContent = coinCount.toString();
         }
         updateProduceButtonState();
-        if (typeof updateSellButtonState === 'function') {
-            updateSellButtonState();
-        }
 
         // 残量表示の色変更
         const batch = Math.max(1, parseInt(batchSizeInput.value, 10) || 1);
@@ -211,25 +207,6 @@ export function setupGame(
             }
             if (producePopcornBtn.classList && typeof producePopcornBtn.classList.remove === 'function') {
                 producePopcornBtn.classList.remove('disabled-btn');
-            }
-        
-            // 販売ボタンの有効/無効状態制御
-            function updateSellButtonState(): void {
-                if (popcornCount < 1) {
-                    if (typeof sellPopcornBtn.setAttribute === 'function') {
-                        sellPopcornBtn.setAttribute('disabled', 'true');
-                    }
-                    if (sellPopcornBtn.classList && typeof sellPopcornBtn.classList.add === 'function') {
-                        sellPopcornBtn.classList.add('disabled-btn');
-                    }
-                } else {
-                    if (typeof sellPopcornBtn.removeAttribute === 'function') {
-                        sellPopcornBtn.removeAttribute('disabled');
-                    }
-                    if (sellPopcornBtn.classList && typeof sellPopcornBtn.classList.remove === 'function') {
-                        sellPopcornBtn.classList.remove('disabled-btn');
-                    }
-                }
             }
         }
     }
@@ -358,7 +335,6 @@ console.log('[DEBUG] matureCount:', corns.filter(c => c.stage === STAGES.length 
     sellPopcornBtn.onclick = function () {
         // 1個ずつ販売（将来的に複数対応可）
         sellPopcorn(1);
-        updateSellButtonState();
     };
 
     // 生産ボタンイベント
@@ -395,7 +371,7 @@ console.log('[DEBUG] matureCount:', corns.filter(c => c.stage === STAGES.length 
         producePopcorn,
         updateGrowth,
         harvestCorn,
-        getState: (): GameState => ({
+        getState: () => ({
             corns,
             cornSeedCount,
             popcornCount,
@@ -418,7 +394,8 @@ console.log('[DEBUG] matureCount:', corns.filter(c => c.stage === STAGES.length 
             }
             saveData();
             renderCorns();
-        }
+        },
+        sellPopcorn
     };
 }
 

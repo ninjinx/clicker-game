@@ -17,8 +17,8 @@ function createMockDOM(): GameDOM {
       textContent: '',
       value: '1',
       classList: { add() {}, remove() {} } as DOMTokenList,
-      appendChild: (_c: any) => {},
-      removeChild: (_c: any) => {},
+      appendChild: () => {},
+      removeChild: () => {},
       setAttribute: function (attr: string, val: string) {
         this.attributes = this.attributes || {};
         this.attributes[attr] = val;
@@ -47,7 +47,7 @@ function createMockDOM(): GameDOM {
       };
       return dummy as unknown as HTMLElement;
     },
-    querySelectorAll: (_selector: string) => {
+    querySelectorAll: () => {
       const arr: HTMLElement[] = [];
       (arr as any).item = (i: number) => arr[i];
       return arr as unknown as NodeListOf<HTMLElement>;

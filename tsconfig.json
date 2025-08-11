@@ -11,6 +11,7 @@
   },
   "include": [
     "script.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "vite.config.ts"
   ]
 }
