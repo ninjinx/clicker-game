@@ -1,5 +1,18 @@
 # ポップコーンメーカー
 
+## Vite + GitHub Pages運用手順
+
+1. `npm run build` でdistディレクトリを生成
+2. GitHubへpushするとActionsが自動でgh-pagesブランチへデプロイ
+3. `https://ユーザー名.github.io/リポジトリ名/` で公開
+
+### ワークフロー図（Mermaid）
+```mermaid
+graph TD
+  A[mainブランチへpush] --> B[GitHub ActionsでViteビルド]
+  B --> C[dist配下をgh-pagesブランチへデプロイ]
+  C --> D[GitHub Pagesで公開]
+```
 このプロジェクトは、GitHub Pages上で動作するシンプルな「ポップコーンメーカー」ゲームです。
 クリックでトウモロコシを育てて収穫し、今後アップグレードや自動化要素の追加も予定しています。
 
