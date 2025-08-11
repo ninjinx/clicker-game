@@ -22,6 +22,7 @@ export type GameState = {
     popcornSold: number;
     popcornEfficiency: number;
     popcornHistory: PopcornEntry[];
+    coinCount: number; // コイン残量
 };
 
 export interface GameDOM {
@@ -48,6 +49,7 @@ export function setupGame(
     const producePopcornBtn = dom.getElementById('produce-popcorn-btn') as HTMLElement;
     const popcornHistoryList = dom.getElementById('popcorn-history') as HTMLElement;
     const sellPopcornBtn = dom.getElementById('sell-popcorn-btn') as HTMLElement;
+    const coinCountDisplay = dom.getElementById('coin-count') as HTMLElement;
 
     // 成長段階
     const STAGES: { name: string; duration: number }[] = [
@@ -60,7 +62,7 @@ export function setupGame(
     // 育成中コーンリスト
     let corns: Corn[] = [];
     let cornSeedCount: number = 0;
-
+    let coinCount: number = 0;
     // ポップコーン在庫・統計
     let popcornCount: number = 0;
     let popcornTotal: number = 0;
@@ -81,14 +83,17 @@ export function setupGame(
                 popcornSold = data.popcornSold || 0;
                 popcornEfficiency = data.popcornEfficiency ?? 2; // 生産効率初期値2
                 popcornHistory = data.popcornHistory || [];
+                coinCount = data.coinCount ?? 0; // コイン初期値0
             } else {
                 cornSeedCount = 30; // 初期値30
                 popcornEfficiency = 2; // 生産効率初期値2
+                coinCount = 0; // コイン初期値0
             }
         } catch (e) {
             console.error('ローカルストレージ読み込みエラー:', e);
             cornSeedCount = 30;
             popcornEfficiency = 2;
+            coinCount = 0;
         }
     }
 
@@ -103,7 +108,8 @@ export function setupGame(
                     popcornTotal,
                     popcornSold,
                     popcornEfficiency,
-                    popcornHistory
+                    popcornHistory,
+                    coinCount
                 }));
             }
         } catch (e) {
@@ -172,7 +178,13 @@ export function setupGame(
         popcornTotalDisplay.textContent = popcornTotal.toString();
         popcornSoldDisplay.textContent = popcornSold.toString();
         popcornEfficiencyDisplay.textContent = popcornEfficiency.toString();
+        if (coinCountDisplay) {
+            coinCountDisplay.textContent = coinCount.toString();
+        }
         updateProduceButtonState();
+        if (typeof updateSellButtonState === 'function') {
+            updateSellButtonState();
+        }
 
         // 残量表示の色変更
         const batch = Math.max(1, parseInt(batchSizeInput.value, 10) || 1);
@@ -199,6 +211,25 @@ export function setupGame(
             }
             if (producePopcornBtn.classList && typeof producePopcornBtn.classList.remove === 'function') {
                 producePopcornBtn.classList.remove('disabled-btn');
+            }
+        
+            // 販売ボタンの有効/無効状態制御
+            function updateSellButtonState(): void {
+                if (popcornCount < 1) {
+                    if (typeof sellPopcornBtn.setAttribute === 'function') {
+                        sellPopcornBtn.setAttribute('disabled', 'true');
+                    }
+                    if (sellPopcornBtn.classList && typeof sellPopcornBtn.classList.add === 'function') {
+                        sellPopcornBtn.classList.add('disabled-btn');
+                    }
+                } else {
+                    if (typeof sellPopcornBtn.removeAttribute === 'function') {
+                        sellPopcornBtn.removeAttribute('disabled');
+                    }
+                    if (sellPopcornBtn.classList && typeof sellPopcornBtn.classList.remove === 'function') {
+                        sellPopcornBtn.classList.remove('disabled-btn');
+                    }
+                }
             }
         }
     }
@@ -304,9 +335,30 @@ console.log('[DEBUG] matureCount:', corns.filter(c => c.stage === STAGES.length 
         });
     }
 
-    // ポップコーン販売（基盤のみ）
+    // ポップコーン販売
+    function sellPopcorn(sellAmount: number = 1): void {
+        if (popcornCount < sellAmount) {
+            alertFn('ポップコーンの在庫が足りません');
+            return;
+        }
+        popcornCount -= sellAmount;
+        coinCount += sellAmount;
+        popcornSold += sellAmount;
+        saveData();
+        updateCounter();
+        // 簡易フィードバック
+        if (typeof sellPopcornBtn.classList?.add === 'function') {
+            sellPopcornBtn.classList.add('sold-effect');
+            setTimeout(() => {
+                sellPopcornBtn.classList.remove('sold-effect');
+            }, 400);
+        }
+    }
+
     sellPopcornBtn.onclick = function () {
-        alert('販売機能は準備中です');
+        // 1個ずつ販売（将来的に複数対応可）
+        sellPopcorn(1);
+        updateSellButtonState();
     };
 
     // 生産ボタンイベント
@@ -350,7 +402,9 @@ console.log('[DEBUG] matureCount:', corns.filter(c => c.stage === STAGES.length 
             popcornTotal,
             popcornSold,
             popcornEfficiency,
-            popcornHistory
+            popcornHistory,
+            coinCount,
+            sellPopcorn
         }),
         addMatureCornForTest: (count: number = 1) => {
             for (let i = 0; i < count; i++) {
